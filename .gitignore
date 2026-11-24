@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+data/*
+!data/fake_statement.csv
+.pytest_cache/

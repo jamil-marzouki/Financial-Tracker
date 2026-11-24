@@ -1,0 +1,9 @@
+{
+  "Groceries": ["REWE", "LIDL", "ALDI", "EDEKA", "PENNY"],
+  "Transport": ["DB ", "DEUTSCHE BAHN", "HEAG", "RMV"],
+  "Rent": ["MIETE", "STUDIERENDENWERK"],
+  "Online": ["AMAZON", "PAYPAL"],
+  "Food": ["MENSA"],
+  "Subscriptions": ["SPOTIFY"],
+  "Income": ["GEHALT", "STIPENDIUM"]
+}
