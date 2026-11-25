@@ -3,22 +3,12 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from analyzer.categorizer import load_rules
+from analyzer.categorizer import CATEGORY_COLORS as BASE_COLORS, load_rules
 from analyzer.db import init_db, load_all
 
 st.set_page_config(page_title="Bank Analyzer", page_icon="💶", layout="wide")
 
-# Fixed colors (Okabe-Ito, colorblind-safe) so a category keeps its color under any filter.
-CATEGORY_COLORS = {
-    "Groceries": "#0072B2",
-    "Transport": "#E69F00",
-    "Rent": "#009E73",
-    "Online": "#CC79A7",
-    "Food": "#56B4E9",
-    "Subscriptions": "#D55E00",
-    "Income": "#F0E442",
-    "Other": "#999999",
-}
+CATEGORY_COLORS = dict(BASE_COLORS)  # copy: user categories are added below
 CATEGORY_ORDER = list(CATEGORY_COLORS)
 
 

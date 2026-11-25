@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bank Analyzer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b2d5b'/%3E%3Cpath d='M9 22V13M16 22V9M23 22v-6' stroke='%2300b3a4' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="#overview" aria-label="Bank Analyzer home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8" fill="currentColor"/>
+          <path d="M9 22V13M16 22V9M23 22v-6" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <span>Bank Analyzer</span>
+      </a>
+
+      <nav class="tabs" aria-label="Main">
+        <a href="#overview" data-view="overview">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
+          <span>Overview</span>
+        </a>
+        <a href="#transactions" data-view="transactions">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          <span>Transactions</span>
+        </a>
+        <a href="#analysis" data-view="analysis">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          <span>Analysis</span>
+        </a>
+      </nav>
+
+      <button class="btn btn-accent" id="importBtn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        <span>Import CSV</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-inner">
+      <div>
+        <p class="greeting" id="greeting">Welcome back</p>
+        <div class="account">
+          <div class="account-head">
+            <span class="account-label">Current account</span>
+            <span class="pill" id="dataUntil">—</span>
+          </div>
+          <p class="balance" id="balance">—</p>
+          <p class="account-sub">Balance of all imported transactions</p>
+        </div>
+      </div>
+
+      <div class="period" role="radiogroup" aria-label="Period">
+        <span class="period-label">Period</span>
+        <div class="segmented" id="periodPicker">
+          <button type="button" role="radio" data-months="1">1M</button>
+          <button type="button" role="radio" data-months="3">3M</button>
+          <button type="button" role="radio" data-months="6">6M</button>
+          <button type="button" role="radio" data-months="12">12M</button>
+          <button type="button" role="radio" data-months="0">All</button>
+        </div>
+        <span class="period-range" id="periodRange">—</span>
+      </div>
+    </div>
+  </section>
+
+  <main id="main" class="container">
+    <!-- Empty state (no data at all) -->
+    <section class="card empty" id="emptyState" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+      <h2>No transactions yet</h2>
+      <p>Import a CSV export from your online banking to get started.</p>
+      <button class="btn btn-primary" type="button" data-open-import>Import CSV</button>
+    </section>
+
+    <!-- ===== Overview ===== -->
+    <section class="view" id="view-overview" aria-labelledby="h-overview">
+      <h1 class="sr-only" id="h-overview">Overview</h1>
+      <div class="kpis">
+        <article class="card kpi">
+          <span class="kpi-label">Income</span>
+          <span class="kpi-value pos" id="kpiIncome">—</span>
+          <span class="kpi-sub" id="kpiIncomeSub"></span>
+        </article>
+        <article class="card kpi">
+          <span class="kpi-label">Spending</span>
+          <span class="kpi-value" id="kpiSpent">—</span>
+          <span class="kpi-sub" id="kpiSpentSub"></span>
+        </article>
+        <article class="card kpi">
+          <span class="kpi-label">Net</span>
+          <span class="kpi-value" id="kpiNet">—</span>
+          <span class="kpi-sub" id="kpiNetSub"></span>
+        </article>
+        <article class="card kpi">
+          <span class="kpi-label">Avg. spending / month</span>
+          <span class="kpi-value" id="kpiAvg">—</span>
+          <span class="kpi-sub" id="kpiAvgSub"></span>
+        </article>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <header class="card-head">
+            <h2>Income vs. spending</h2>
+            <div class="legend">
+              <span><i style="background:var(--pos)"></i>Income</span>
+              <span><i style="background:var(--brand)"></i>Spending</span>
+            </div>
+          </header>
+          <div class="chart-box"><canvas id="cashflowChart" aria-label="Income and spending per month"></canvas></div>
+        </article>
+
+        <article class="card">
+          <header class="card-head"><h2>Spending by category</h2></header>
+          <div class="donut-wrap">
+            <div class="donut-box">
+              <canvas id="donutChart" aria-label="Spending share per category"></canvas>
+              <div class="donut-center"><span>Total</span><strong id="donutTotal">—</strong></div>
+            </div>
+            <ul class="cat-list" id="catList"></ul>
+          </div>
+        </article>
+      </div>
+
+      <article class="card">
+        <header class="card-head">
+          <h2>Recent transactions</h2>
+          <a class="link" href="#transactions">Show all →</a>
+        </header>
+        <ul class="tx-list" id="recentList"></ul>
+      </article>
+    </section>
+
+    <!-- ===== Transactions ===== -->
+    <section class="view" id="view-transactions" aria-labelledby="h-tx" hidden>
+      <div class="card">
+        <header class="card-head">
+          <h1 id="h-tx">Transactions</h1>
+          <button class="btn btn-ghost" id="exportBtn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+            Export CSV
+          </button>
+        </header>
+
+        <div class="toolbar">
+          <label class="search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input type="search" id="search" placeholder="Search description…" autocomplete="off">
+          </label>
+          <div class="segmented segmented-light" id="typeFilter" role="radiogroup" aria-label="Type">
+            <button type="button" role="radio" data-type="all" aria-checked="true">All</button>
+            <button type="button" role="radio" data-type="in">Income</button>
+            <button type="button" role="radio" data-type="out">Expenses</button>
+          </div>
+        </div>
+        <div class="chips" id="catChips" aria-label="Categories"></div>
+
+        <div class="tx-summary" id="txSummary"></div>
+        <div id="txGroups"></div>
+        <button class="btn btn-ghost btn-block" id="moreBtn" type="button" hidden>Load more</button>
+      </div>
+    </section>
+
+    <!-- ===== Analysis ===== -->
+    <section class="view" id="view-analysis" aria-labelledby="h-an" hidden>
+      <h1 class="sr-only" id="h-an">Analysis</h1>
+      <article class="card">
+        <header class="card-head"><h2>Spending per month by category</h2></header>
+        <div class="legend legend-wrap" id="stackLegend"></div>
+        <div class="chart-box chart-tall"><canvas id="stackChart" aria-label="Spending per month by category"></canvas></div>
+      </article>
+
+      <div class="grid-2">
+        <article class="card">
+          <header class="card-head">
+            <h2>Category over time</h2>
+            <select id="trendCat" class="select" aria-label="Category"></select>
+          </header>
+          <div class="chart-box"><canvas id="trendChart" aria-label="Monthly total for selected category"></canvas></div>
+        </article>
+
+        <article class="card">
+          <header class="card-head"><h2>Top merchants</h2></header>
+          <ol class="merchants" id="merchants"></ol>
+        </article>
+      </div>
+    </section>
+
+    <p class="footnote">Bank Analyzer · local data only, nothing leaves your computer.</p>
+  </main>
+
+  <!-- Import dialog -->
+  <dialog id="importDialog" aria-labelledby="h-import">
+    <form method="dialog" class="dialog-body" id="importForm">
+      <header class="card-head">
+        <h2 id="h-import">Import bank statement</h2>
+        <button class="icon-btn" value="cancel" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </header>
+      <label class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept=".csv,text/csv">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        <strong id="dropText">Drop a CSV here or click to choose</strong>
+        <span>Semicolon-separated · columns Buchungstag, Verwendungszweck, Betrag</span>
+      </label>
+      <p class="form-msg" id="importMsg" role="status"></p>
+      <footer class="dialog-foot">
+        <button class="btn btn-ghost" value="cancel">Cancel</button>
+        <button class="btn btn-primary" id="importSubmit" type="button" disabled>Import</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

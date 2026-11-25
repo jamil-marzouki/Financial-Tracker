@@ -28,7 +28,7 @@ def load_statement(path: str | Path) -> pd.DataFrame:
     missing = {"date", "description", "amount"} - set(df.columns)
     if missing:
         raise ValueError(
-            f"Missing columns {sorted(missing)} in {path}. "
+            f"Missing columns {sorted(missing)}. "
             f"Found: {list(df.columns)}. Adjust COLUMN_MAP in analyzer/loader.py."
         )
 
